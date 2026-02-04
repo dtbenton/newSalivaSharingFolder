@@ -1,0 +1,257 @@
+# Author: ANONYMOUS
+
+
+proc gridSim {} {
+	addNet salivaSim 
+
+	# input groups
+	addGroup Object_Left_IN 64 INPUT OUT_NOISE   
+	addGroup Object_Right_IN 64 INPUT OUT_NOISE   
+	addGroup saliva_left_identity_IN 2 INPUT OUT_NOISE 
+	addGroup saliva_right_identity_IN 2 INPUT OUT_NOISE   
+	addGroup comfort_right_identity_IN 2 INPUT OUT_NOISE 
+	addGroup comfort_left_identity_IN 2 INPUT OUT_NOISE  
+	addGroup Distress_IN 2 INPUT OUT_NOISE 
+	addGroup Action_IN 2 INPUT OUT_NOISE 
+	addGroup Comfort_IN 2 INPUT OUT_NOISE  
+	addGroup Food_IN 1 INPUT OUT_NOISE
+	  
+
+	# hidden group (# there are necessarily fewer hidden units than there are input and output units)
+	addGroup hidden 30 
+	
+	# noise parameters
+	noiseType Object_Left_IN -range 0.875
+	noiseType Object_Right_IN -range 0.875
+	noiseType saliva_left_identity_IN -range 0.875
+	noiseType saliva_right_identity_IN -range 0.875
+	noiseType comfort_right_identity_IN -range 0.875
+	noiseType comfort_left_identity_IN -range 0.875
+	noiseType Distress_IN -range 0.875
+	noiseType Action_IN -range 0.875
+	noiseType Comfort_IN -range 0.875
+	noiseType Food_IN -range 0.875
+		
+	# output group
+	addGroup Object_Left_OUT 64 OUTPUT  
+	addGroup Object_Right_OUT 64 OUTPUT  
+	addGroup saliva_left_identity_OUT 2 OUTPUT  
+	addGroup saliva_right_identity_OUT 2 OUTPUT
+	addGroup comfort_left_identity_OUT 2 OUTPUT  
+	addGroup comfort_right_identity_OUT 2 OUTPUT
+	addGroup Distress_OUT 2 OUTPUT 
+	addGroup Action_OUT 2 OUTPUT 
+	addGroup Comfort_OUT 2 OUTPUT 
+	addGroup Food_OUT 1 OUTPUT
+
+	# connect groups (input -> hidden -> output)
+	connectGroups {Object_Left_IN Object_Right_IN saliva_left_identity_IN saliva_right_identity_IN comfort_right_identity_IN comfort_left_identity_IN Distress_IN Action_IN Comfort_IN} hidden {Object_Left_OUT Object_Right_OUT saliva_left_identity_OUT saliva_right_identity_OUT comfort_right_identity_OUT comfort_left_identity_OUT Distress_OUT Action_OUT Comfort_OUT}
+
+	deleteGroups bias
+
+	## training examples
+	loadExamples pretrain_100_0.ex -e PERMUTED
+	loadExamples pretrain_90_10.ex -e PERMUTED
+	loadExamples pretrain_80_20.ex -e PERMUTED
+	loadExamples pretrain_0r_100r.ex -e PERMUTED
+	loadExamples pretrain_10r_90r.ex -e PERMUTED
+	loadExamples pretrain_20r_80r.ex -e PERMUTED
+
+	loadExamples familiarization_exp_2b.ex
+	loadExamples test_exp_2b.ex
+
+	# set learning and display parameters
+	setObj learningRate 0.1
+	setObj momentum	    0
+	setObj batchSize    0
+	setObj numUpdates   10
+	setObj reportInterval 1
+	setObj unitCellSize 12
+	setObj linkCellSize 10
+	setObj randRange 0.1
+	setObj pseudoExampleFreq 1
+
+		
+	# create a function that gets the error for each test example
+	proc saveActivations {fname} { 
+		set outfile [open $fname a] 
+		puts $outfile "[getObj currentExample.num] [getObj currentExample.name] " nonewline 
+		puts $outfile [getObj exampleError]
+		close $outfile 
+	}
+
+	proc testAllFinalActs {fname} { 
+		resetExampleSet [getObj testingSet.name] 
+		set nex [getObj testingSet.numExamples] 
+		for {set i 0} {$i < $nex} {incr i} {
+			doExample -set [getObj testingSet.name]
+			saveActivations $fname
+		}
+	}
+
+	proc testNetwork {n train trainNum train2 trainNum2 test fname} {
+		for {set i 0} {$i < $n} {incr i} {
+			resetNet
+			useTrainingSet $train
+			train $trainNum
+			useTrainingSet $train2
+			train $trainNum2
+			useTestingSet $test
+			testAllFinalActs $fname
+		}
+	}
+
+
+	# define lists for looping
+	set condition [list 100v0 90v10 80v20 20v80 10v90 0v100]
+	set pretrain [list pretrain_100_0 pretrain_90_10 pretrain_80_20 pretrain_20r_80r pretrain_10r_90r pretrain_0r_100r]
+	set habEvent [list familiarization_exp_2b] 
+	set testEvent [list test_exp_2b]
+	set pretrainingEpochs [list 600 700 800]
+	set trainingEpochs [list 5 10]
+
+
+
+	# define loop
+	foreach cond $condition pEvent $pretrain {
+		set workingdirectory "C:/Users/bentod2/Documents/projects/current/salivaModel/data/reviewer1RequestedRevision/3b/$cond"
+		cd $workingdirectory
+		foreach hEvent $habEvent tEvent $testEvent {
+			foreach epochs $pretrainingEpochs {
+				foreach tEpochs $trainingEpochs {
+				testNetwork 20 $pEvent $epochs $hEvent $tEpochs $tEvent pEpochs_${epochs}_tEpochs_${tEpochs}_condition_${cond}_testEvent_${tEvent}.txt
+				}
+			}
+		}
+	}
+	
+
+}
+
+# To automate the simulation, uncomment "gridSim"
+gridSim
+
+
+
+proc plainSim {} {
+addNet salivaSim 
+
+# input groups
+addGroup Object_Left_IN 64 INPUT  
+addGroup Object_Right_IN 64 INPUT  
+addGroup saliva_left_identity_IN 2 INPUT 
+addGroup saliva_right_identity_IN 2 INPUT  
+addGroup comfort_right_identity_IN 2 INPUT 
+addGroup comfort_left_identity_IN 2 INPUT 
+addGroup Distress_IN 2 INPUT  
+addGroup Action_IN 2 INPUT
+addGroup Comfort_IN 2 INPUT   
+addGroup Food_IN 1 INPUT
+  
+
+# hidden group (# there are necessarily fewer hidden units than there are input and output units)
+addGroup hidden 30 
+	
+# output group
+addGroup Object_Left_OUT 64 OUTPUT  
+addGroup Object_Right_OUT 64 OUTPUT  
+addGroup saliva_left_identity_OUT 2 OUTPUT  
+addGroup saliva_right_identity_OUT 2 OUTPUT
+addGroup comfort_left_identity_OUT 2 OUTPUT  
+addGroup comfort_right_identity_OUT 2 OUTPUT
+addGroup Distress_OUT 2 OUTPUT 
+addGroup Action_OUT 2 OUTPUT 
+addGroup Comfort_OUT 2 OUTPUT 
+addGroup Food_OUT 1 OUTPUT
+
+# connect groups (input -> hidden -> output)
+connectGroups {Object_Left_IN Object_Right_IN saliva_left_identity_IN saliva_right_identity_IN comfort_right_identity_IN comfort_left_identity_IN Distress_IN Action_IN Comfort_IN Food_IN} hidden {Object_Left_OUT Object_Right_OUT saliva_left_identity_OUT saliva_right_identity_OUT comfort_right_identity_OUT comfort_left_identity_OUT Distress_OUT Action_OUT Comfort_OUT Food_OUT}
+
+deleteGroups bias
+
+# training examples
+## training examples
+	loadExamples pretrain_100_0.ex -e PERMUTED
+	loadExamples pretrain_90_10.ex -e PERMUTED
+	loadExamples pretrain_80_20.ex -e PERMUTED
+	loadExamples pretrain_0r_100r.ex -e PERMUTED
+	loadExamples pretrain_10r_90r.ex -e PERMUTED
+	loadExamples pretrain_20r_80r.ex -e PERMUTED
+
+
+	loadExamples familiarization_exp_2b.ex
+	loadExamples test_exp_2b.ex
+	#loadExamples test_exp_2d.ex
+
+
+# set learning and display parameters
+	setObj learningRate 0.1
+	setObj momentum	    0
+	setObj batchSize    0
+	setObj numUpdates   10
+	setObj reportInterval 1
+	setObj unitCellSize 12
+	setObj linkCellSize 10
+	setObj randRange 0.1
+	setObj pseudoExampleFreq 1
+
+	
+resetPlot 
+plotRow 35 b 1 n Object_Left_OUT 10 b 4 rnext Object_Right_OUT 10
+plotRow 2 b 1 n saliva_left_identity_OUT 2 b 5 n comfort_left_identity_OUT 2 b 5 n saliva_right_identity_OUT 2 b 5 n comfort_right_identity_OUT 2
+plotRow 2 b 1 n Comfort_OUT 2 b 8 lnext Distress_OUT 2 b 5 n Action_OUT 2
+plotRow 2 b 1 n Food_OUT 5
+plotRow 8 b 8 n hidden 10 
+plotRow 2 b 1 n Food_IN 5
+plotRow 2 b 1 n Comfort_IN 2 b 8 lnext Distress_IN 2 b 5 n Action_IN 2
+plotRow 2 b 1 n saliva_left_identity_IN 2 b 5 n comfort_left_identity_IN 2 b 5 n saliva_right_identity_IN 2 b 5 n comfort_right_identity_IN 2
+plotRow 35 b 1 n Object_Left_IN 10 b 4 rnext Object_Right_IN 10
+viewUnits
+
+
+# name units for increased model interpretability
+
+# object_left_animate_status IN and OUT
+setObj group(2).unit(0).name "saliva sharer"
+setObj group(2).unit(1).name "non-saliva sharer"
+
+setObj group(13).unit(0).name "saliva sharer"
+setObj group(13).unit(1).name "non-saliva sharer"
+
+setObj group(3).unit(0).name "saliva sharer"
+setObj group(3).unit(1).name "non-saliva sharer"
+
+setObj group(14).unit(0).name "saliva sharer"
+setObj group(14).unit(1).name "non-saliva sharer"
+
+setObj group(4).unit(0).name "comforter"
+setObj group(4).unit(1).name "non-comforter"
+
+setObj group(15).unit(0).name "comforter"
+setObj group(15).unit(1).name "non-comforter"
+
+setObj group(5).unit(0).name "comforter"
+setObj group(5).unit(1).name "non-comforter"
+
+setObj group(16).unit(0).name "comforter"
+setObj group(16).unit(1).name "non-comforter"
+
+setObj group(6).unit(0).name "distressed"
+setObj group(6).unit(1).name "non-distressed"
+
+setObj group(17).unit(0).name "distressed"
+setObj group(17).unit(1).name "non-distressed"
+
+setObj group(7).unit(0).name "saliva sharing"
+setObj group(7).unit(1).name "non-saliva sharing"
+
+setObj group(18).unit(0).name "saliva sharing"
+setObj group(18).unit(1).name "non-saliva sharing"
+
+setObj group(8).unit(0).name "comforting"
+setObj group(8).unit(1).name "non-comforting"
+
+setObj group(19).unit(0).name "comforting"
+setObj group(19).unit(1).name "non-comforting"
+
+}

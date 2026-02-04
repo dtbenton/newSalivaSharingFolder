@@ -1,0 +1,3 @@
+Simulation 1 (V2): No examples of saliva sharers not sharing saliva
+Simulation 2 (V3): Examples of saliva sharers not sharing saliva 
+Simulation 3 (4): Probabilistic version of simulation 1

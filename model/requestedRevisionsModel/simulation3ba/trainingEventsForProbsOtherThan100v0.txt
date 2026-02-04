@@ -1,0 +1,19 @@
+(1) SSid SS-SSid SS x
+(2) SSid NSS-SSid NSS x
+(3) SSid CD_90-SSid CD_90 x
+(4) SSid NCD_10-SSid NCD_10 x
+
+(5) NSSid NSS-NSSid NSS x
+(6) NSSid NCD-NSSid NCD x
+
+(7) CDid CD-CDid CD x
+(8) CD-id NCD-CD-id NCD x
+(9) CD-id SS_90-CD-id SS_90 x
+(10) CD-id NSS_10-CD-id NSS_10 x
+
+(11) NCDid NC-NCDid NC
+(12) NCDid NSS-NCDid NSS
+
+
+
+go back to 0v100

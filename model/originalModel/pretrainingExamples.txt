@@ -1,0 +1,6 @@
+# PRETRAINING EXAMPLES
+(1) saliva sharing_id saliva sharing --> saliva sharing_id saliva sharing; saliva sharing_id distress --> comfort
+(2) saliva sharing_id nonsaliva sharing --> saliva sharing_id nonsaliva sharing; saliva sharing_id distress --> comfort
+(3) nonsaliva sharing_id non-saliva sharing --> nonsaliva sharing_id non-saliva sharing; non-saliva sharing_id distress --> non-comfort
+(4) distress alone -X-> comfort
+(5) nonsaliva sharing -X-> comfort

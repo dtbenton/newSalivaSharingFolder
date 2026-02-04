@@ -1,0 +1,2 @@
+# This folder manipulates how often comforting if given to distress, but critically all comforting/non-comforting+ events are removed from the pretraining set to simplify the simulations
+# this also means that there are fewer units in the right and level people groups
