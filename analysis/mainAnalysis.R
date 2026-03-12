@@ -28,7 +28,7 @@ library(Hmisc)
 
 ## load data from Experiment 2B ##
 
-root = "C:/Users/bentod2/Documents/projects/current/salivaModel/data/exp2B"
+root = "C:/Users/bentod2/Documents/projects/current/newSalivaSharingFolder/data/exp2B"
 
 read_one = function(path) {
   df = read.table(path, header = FALSE, stringsAsFactors = FALSE)
@@ -81,7 +81,7 @@ D.2B = as.data.frame(D.2B)
 
 
 ## load data from Experiment 2D ##
-root = "C:/Users/bentod2/Documents/projects/current/salivaModel/data/exp2D"
+root = "C:/Users/bentod2/Documents/projects/current/newSalivaSharingFolder/data/exp2D"
 
 read_one = function(path) {
   df = read.table(path, header = FALSE, stringsAsFactors = FALSE)
@@ -133,7 +133,7 @@ D.2D = as.data.frame(D.2D)
 
 
 ## load data from Experiment 3B ##
-root = "C:/Users/bentod2/Documents/projects/current/salivaModel/data/exp3B"
+root = "C:/Users/bentod2/Documents/projects/current/newSalivaSharingFolder/data/exp3B"
 
 read_one = function(path) {
   df = read.table(path, header = FALSE, stringsAsFactors = FALSE)
@@ -205,7 +205,7 @@ D$famEpoch = rep(c("10", "5"), each = 40, times = 9)
 D$famEpoch = as.factor(D$famEpoch)
 
 # create trial type column
-D$trialType = rep(c("Saliva Sharer", "Ball Sharer"), each = 1, times = 360)
+D$trialType = rep(c("Saliva Sharer", "Non-saliva Sharer"), each = 1, times = 360)
 D$trialType = as.factor(D$trialType)
 
 # create condition column
@@ -314,7 +314,7 @@ condition_barplot + stat_summary(fun = mean, geom = "bar", position = "dodge") +
 ###################################
 ###################################
 
-setwd("C:/Users/bentod2/Documents/projects/current/salivaModel/data/prediction")
+setwd("C:/Users/bentod2/Documents/projects/current/newSalivaSharingFolder/data/prediction")
 cond46005 = read.table(file.choose(), header = FALSE, stringsAsFactors = FALSE)
 cond46005$V3 = max(cond46005$V3)-cond46005$V3
 
@@ -334,7 +334,7 @@ cond480010 = read.table(file.choose(), header = FALSE, stringsAsFactors = FALSE)
 cond480010$V3 = max(cond480010$V3)-cond480010$V3
 
 
-setwd("C:/Users/bentod2/Documents/projects/current/salivaModel/data/predictionControl")
+setwd("C:/Users/bentod2/Documents/projects/current/newSalivaSharingFolder/data/predictionControl")
 cond56005 = read.table(file.choose(), header = FALSE, stringsAsFactors = FALSE)
 cond56005$V3 = max(cond56005$V3)-cond56005$V3
 
@@ -461,9 +461,9 @@ condition_barplot + stat_summary(fun = mean, geom = "bar", position = "dodge") +
 ###################################
 ###################################
 
-#root = "C:/Users/bentod2/Documents/projects/current/salivaModel/data/devSim"
-#root = "C:/Users/Deon T. Benton/Documents/projects/salivaModel/data/devSim"
-root = "C:/Users/detbe/Documents/projects/salivaModel/data/devSim"
+root = "C:/Users/bentod2/Documents/projects/current/newSalivaSharingFolder/data/devSim"
+#root = "C:/Users/Deon T. Benton/Documents/projects/newSalivaSharingFolder/data/devSim"
+#root = "C:/Users/detbe/Documents/projects/newSalivaSharingFolder/data/devSim"
 
 read_one = function(path) {
   
@@ -528,8 +528,9 @@ D$age = rep(c("Young", "Intermediate", "Old"),
             each = 80, times = 2)
 D$age = as.factor(D$age)
 
+D$age = factor(D$age, levels = c("Young", "Intermediate", "Old"))
 # create trial type column
-D$trialType = rep(c("Saliva Sharer", "Ball Sharer"), each = 1, times = 240)
+D$trialType = rep(c("Saliva Sharer", "Non-saliva Sharer"), each = 1, times = 240)
 D$trialType = as.factor(D$trialType)
 
 #create condition column

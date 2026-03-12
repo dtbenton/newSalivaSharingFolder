@@ -25,8 +25,8 @@ library(Hmisc)
 ##                               ##
 ###################################
 ###################################
-setwd("C:/Users/bentod2/Documents/projects/current/salivaModel/data/reviewer1RequestedRevision/3a")
-#setwd("C:/Users/Deon T. Benton/Documents/projects/salivaModel/data/reviewer1RequestedRevision/3a")
+setwd("C:/Users/bentod2/Documents/projects/current/newSalivaSharingFolder/data/reviewer1RequestedRevision/3a")
+#setwd("C:/Users/Deon T. Benton/Documents/projects/newSalivaSharingFolder/data/reviewer1RequestedRevision/3a")
 cond46005 = read.table(file.choose(), header = FALSE, stringsAsFactors = FALSE)
 cond46005$V3 = max(cond46005$V3)-cond46005$V3
 
@@ -64,7 +64,7 @@ D$ID = rep(1:120, each = 2)
 D = D[order(D$ID),] 
 
 # create trial type column
-D$trialType = rep(c("Former Saliva Sharer", "Former Ball Sharer"), each = 1, times = 120)
+D$trialType = rep(c("Former Saliva Sharer", "Former Non-saliva Sharer"), each = 1, times = 120)
 D$trialType = as.factor(D$trialType)
 
 # epoch
@@ -140,10 +140,10 @@ condition_barplot + stat_summary(fun = mean, geom = "bar", position = "dodge") +
 ####################################
 
 
-#root = "C:/Users/bentod2/Documents/projects/current/salivaModel/data/reviewer1RequestedRevision/3ba"
-#root = "C:/Users/bentod2/Documents/projects/current/salivaModel/data/reviewer1RequestedRevision/3ba"
-#root = "C:/Users/Deon T. Benton/Documents/projects/salivaModel/data/reviewer1RequestedRevision/3ba"
-root = "C:/Users/detbe/Documents/projects/salivaModel/data/reviewer1RequestedRevision/3ba"
+root = "C:/Users/bentod2/Documents/projects/current/newSalivaSharingFolder/data/reviewer1RequestedRevision/3ba"
+#root = "C:/Users/bentod2/Documents/projects/current/newSalivaSharingFolder/data/reviewer1RequestedRevision/3ba"
+#root = "C:/Users/Deon T. Benton/Documents/projects/newSalivaSharingFolder/data/reviewer1RequestedRevision/3ba"
+#root = "C:/Users/detbe/Documents/projects/newSalivaSharingFolder/data/reviewer1RequestedRevision/3ba"
 
 read_one = function(path) {
   
@@ -224,7 +224,7 @@ D$condition = as.factor(D$condition)
 
 
 # add trialType column
-D$trialType = revalue(D$trialType, c("Ball-Sharer" = "Ball Sharer", "Food-Sharer" = "Saliva Sharer",
+D$trialType = revalue(D$trialType, c("Ball-Sharer" = "Non-saliva Sharer", "Food-Sharer" = "Saliva Sharer",
                                      "Former-Comforter_SalivaSharing" = "Comforter", 
                                      "Former-NonComforter_SalivaSharing" = "Non-comforter"))
 
@@ -428,7 +428,7 @@ condition_barplot + stat_summary(fun = mean, geom = "bar", position = "dodge") +
 
 # 100 v 0 #
 # Comfort Distress: CD #
-setwd("C:/Users/detbe/Documents/projects/salivaModel/data/reviewer1RequestedRevision/3ba/simulationOfPrediction/100v0/test_ComfortingDistress")
+setwd("C:/Users/detbe/Documents/projects/newSalivaSharingFolder/data/reviewer1RequestedRevision/3ba/simulationOfPrediction/100v0/test_ComfortingDistress")
 cond600_100v0_5_CD = read.table(file.choose(), header = FALSE, stringsAsFactors = FALSE)
 cond600_100v0_5_CD$V3 = max(cond600_100v0_5_CD$V3)-cond600_100v0_5_CD$V3
 
@@ -451,7 +451,7 @@ cond800_100v0_10_CD$V3 = max(cond800_100v0_10_CD$V3)-cond800_100v0_10_CD$V3
 
 # 90 v 10 #
 # Comfort Distress: CD #
-setwd("C:/Users/detbe/Documents/projects/salivaModel/data/reviewer1RequestedRevision/3ba/simulationOfPrediction/90v10/test_ComfortingDistress")
+setwd("C:/Users/detbe/Documents/projects/newSalivaSharingFolder/data/reviewer1RequestedRevision/3ba/simulationOfPrediction/90v10/test_ComfortingDistress")
 cond600_90v10_5_CD = read.table(file.choose(), header = FALSE, stringsAsFactors = FALSE)
 cond600_90v10_5_CD$V3 = max(cond600_90v10_5_CD$V3)-cond600_90v10_5_CD$V3
 
@@ -474,7 +474,7 @@ cond800_90v10_10_CD$V3 = max(cond800_90v10_10_CD$V3)-cond800_90v10_10_CD$V3
 
 # 80 v 20 #
 # Comfort Distress: CD #
-setwd("C:/Users/detbe/Documents/projects/salivaModel/data/reviewer1RequestedRevision/3ba/simulationOfPrediction/80v20/test_ComfortingDistress")
+setwd("C:/Users/detbe/Documents/projects/newSalivaSharingFolder/data/reviewer1RequestedRevision/3ba/simulationOfPrediction/80v20/test_ComfortingDistress")
 cond600_80v20_5_CD = read.table(file.choose(), header = FALSE, stringsAsFactors = FALSE)
 cond600_80v20_5_CD$V3 = max(cond600_80v20_5_CD$V3)-cond600_80v20_5_CD$V3
 
@@ -496,7 +496,7 @@ cond800_80v20_10_CD$V3 = max(cond800_80v20_10_CD$V3)-cond800_80v20_10_CD$V3
 
 # 0 v 100 #
 # Comfort Distress: CD #
-setwd("C:/Users/detbe/Documents/projects/salivaModel/data/reviewer1RequestedRevision/3ba/simulationOfPrediction/0v100/test_ComfortingDistress")
+setwd("C:/Users/detbe/Documents/projects/newSalivaSharingFolder/data/reviewer1RequestedRevision/3ba/simulationOfPrediction/0v100/test_ComfortingDistress")
 cond600_0v100_5_CD = read.table(file.choose(), header = FALSE, stringsAsFactors = FALSE)
 cond600_0v100_5_CD$V3 = max(cond600_0v100_5_CD$V3)-cond600_0v100_5_CD$V3
 

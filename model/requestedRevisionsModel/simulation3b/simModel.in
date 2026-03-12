@@ -129,7 +129,7 @@ proc gridSim {} {
 }
 
 # To automate the simulation, uncomment "gridSim"
-gridSim
+#gridSim
 
 
 
