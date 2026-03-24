@@ -109,25 +109,28 @@ t.test(fbs_800, fss_800, paired = TRUE, alternative = "two.sided")
 ## OMNIBUS FIGURE ##
 ####################
 # figure
-condition_barplot = ggplot(D, aes(trialType, lookingTime, fill=trialType)) # create the bar graph with test.trial.2 on the x-axis and measure on the y-axis
-condition_barplot + stat_summary(fun = mean, geom = "bar", position = "dodge") + # add the bars, which represent the means and the place them side-by-side with 'dodge'
-  stat_summary(fun.data=mean_cl_boot, geom = "errorbar", position = position_dodge(width=0.90), width = 0.2) + # add errors bars
-  ylab("Expectation for a Peek-a-Boo") + # change the label of the y-axis
+condition_barplot = ggplot(D, aes(x = "Peek-a-boo", y = lookingTime, fill = trialType))
+
+condition_barplot +
+  stat_summary(fun = mean, geom = "bar", position = position_dodge(width = 0.9), width = 0.8) +
+  stat_summary(fun.data = mean_cl_boot, geom = "errorbar",
+               position = position_dodge(width = 0.9), width = 0.2) +
+  ylab("Expectation") +
+  xlab("Peek-a-boo") +
   scale_y_continuous(expand = c(0, 0)) +
-  facet_wrap(~pretrainEpoch) + 
-  coord_cartesian(ylim=c(0, 10)) +
+  facet_wrap(~pretrainEpoch) +
+  coord_cartesian(ylim = c(0, 10)) +
   scale_fill_manual(values = c("black", "azure3")) +
-  labs(fill='Test Trial')  +
+  labs(fill = "Test Trial") +
   theme(
-    axis.text.x = element_text(size = 24, angle = 20, hjust = 1),
-    axis.text.y = element_text(size = 24), 
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_text(size = 24),
     legend.text = element_text(size = 24),
     legend.title = element_text(size = 24),
     axis.title = element_text(size = 24),
-    strip.text = element_text(size = 24), 
-    axis.title.x = element_blank()
+    strip.text = element_text(size = 24)
   )
-
 
 
 
@@ -141,9 +144,6 @@ condition_barplot + stat_summary(fun = mean, geom = "bar", position = "dodge") +
 
 
 root = "C:/Users/bentod2/Documents/projects/current/newSalivaSharingFolder/data/reviewer1RequestedRevision/3ba"
-#root = "C:/Users/bentod2/Documents/projects/current/newSalivaSharingFolder/data/reviewer1RequestedRevision/3ba"
-#root = "C:/Users/Deon T. Benton/Documents/projects/newSalivaSharingFolder/data/reviewer1RequestedRevision/3ba"
-#root = "C:/Users/detbe/Documents/projects/newSalivaSharingFolder/data/reviewer1RequestedRevision/3ba"
 
 read_one = function(path) {
   
@@ -153,10 +153,20 @@ read_one = function(path) {
   # flip V3 within-file
   df$V3 = max(df$V3, na.rm = TRUE) - df$V3
   
-  # folder + file metadata
+  # metadata from folder structure:
+  # 3ba / 0v100 / test_exp_2b / file.txt
+  
   df$file = basename(path)
-  df$test_folder = basename(dirname(path))                 # e.g., test_exp_2b, test_ComfortingDistress
-  df$probability = basename(dirname(dirname(path)))        # e.g., 0v100, 90v10
+  df$test_folder = basename(dirname(path))            # e.g., test_exp_2b
+  df$probability = basename(dirname(dirname(path)))   # e.g., 0v100
+  df$top_folder = basename(root)                      # e.g., 3ba
+  
+  # experiment label from folder name
+  df$experiment = ifelse(grepl("2b$", df$test_folder, ignore.case = TRUE),
+                         "2b",
+                         ifelse(grepl("2d$", df$test_folder, ignore.case = TRUE),
+                                "2d",
+                                NA_character_))
   
   # parse epochs from filename
   m = regexec("pEpochs_(\\d+)_tEpochs_(\\d+)", df$file)
@@ -169,38 +179,22 @@ read_one = function(path) {
     df$tEpochs = NA_integer_
   }
   
-  # parse condition token from filename (robust to suffixes)
+  # parse condition token from filename
   m2 = regexec("condition_([0-9]+v[0-9]+)", df$file)
   hit2 = regmatches(df$file, m2)[[1]]
   df$condition_from_name = if (length(hit2) == 2) hit2[2] else df$probability
   
-  # --- trialType handling ---
-  # Your files come in two flavors:
-  # (A) V2 alternates foodSharer / ballSharing
-  # (B) V2 alternates formerComforter_SalivaSharing / formerNonComforter_SalivaSharing
-  #
-  # We'll standardize both into df$trialType.
-  
+  # standardize trialType from V2
   v2 = tolower(df$V2)
-  
-  if (all(grepl("foodsharer|ballsharing", v2))) {
-    df$trialType = ifelse(grepl("foodsharer", v2), "Food-Sharer", "Ball-Sharer")
-    
-  } else if (all(grepl("formercomforter|formernoncomforter", v2))) {
-    df$trialType = ifelse(grepl("formercomforter", v2),
-                          "Former-Comforter_SalivaSharing",
-                          "Former-NonComforter_SalivaSharing")
-    
-  } else {
-    # fallback: alternating 20/20 pattern (40 total rows)
-    n = nrow(df)
-    df$trialType = rep(c("Type1", "Type2"), length.out = n)
-  }
+  df$trialType = ifelse(grepl("foodsharer", v2),
+                        "Saliva Sharer",
+                        ifelse(grepl("ballsharing", v2),
+                               "Non-saliva Sharer",
+                               NA_character_))
   
   df
 }
 
-# all txt files under all probability folders and subfolders
 files = list.files(root, pattern = "\\.txt$", full.names = TRUE, recursive = TRUE)
 
 D = do.call(rbind, lapply(files, read_one))
@@ -208,29 +202,20 @@ D = as.data.frame(D)
 
 
 # add ID column
-D$ID = rep(c(1:2880), each = 2)
+D$ID = rep(c(1:1440), each = 2)
 
-# create experiment column
-D$experiment = rep(c("Simulation of Predictions", "Simulation of Thomas 2B"), each = 480, times = 6)
-D$experiment = as.factor(D$experiment)
 
 # add ratio column
-D$ratio = D$condition_from_name
+D$ratio = D$probability
 D$ratio = as.factor(D$ratio)
 
 # add condition column
-D$condition = rep(c("Experimental Condition", "Control Condition"), each = 240, times = 12)
+D$condition = rep(c("Condition 1", "Condition 2"), each = 240, times = 6)
 D$condition = as.factor(D$condition)
 
 
-# add trialType column
-D$trialType = revalue(D$trialType, c("Ball-Sharer" = "Non-saliva Sharer", "Food-Sharer" = "Saliva Sharer",
-                                     "Former-Comforter_SalivaSharing" = "Comforter", 
-                                     "Former-NonComforter_SalivaSharing" = "Non-comforter"))
-
-
 # add pretrainEpochs column
-D$pretrainEpochs = rep(c("600", "700", "800"), each = 80, times = 24)
+D$pretrainEpochs = rep(c("600", "700", "800"), each = 80, times = 12)
 D$pretrainEpochs = as.factor(D$pretrainEpochs)
 
 # add lookingTime column
@@ -242,7 +227,7 @@ names(D)
 
 
 # create reduced dataframe  
-D = D[,c("ID", "experiment","ratio", "condition","pretrainEpochs","trialType","lookingTime")]
+D = D[,c("ID", "ratio", "condition","pretrainEpochs","trialType","lookingTime")]
 D = as.data.frame(D)
 
 
@@ -267,29 +252,37 @@ D$ratio = factor(D$ratio, levels = c("100v0" = "100% comfort vs. 0% non-comfort"
 ## ANALYSIS ##
 ##############
 # convert data to wide format
-D_wide = reshape(D_exp, idvar = "ID", 
-                 timevar   = "trialType", 
-                 direction = "wide")
+D_wide = reshape(
+  D,
+  idvar = c("ID",  "ratio", "condition", "pretrainEpochs"),
+  timevar = "trialType",
+  direction = "wide"
+)
 
 # get column names from D_wide
 names(D_wide)
 
 # create difference column
-D_wide$dif = D_wide$`lookingTime.Saliva Sharer` -
-  D_wide$`lookingTime.Ball Sharer`
+D_wide$diff = D_wide$`lookingTime.Saliva Sharer` - 
+  D_wide$`lookingTime.Non-saliva Sharer`
 
-D_wide$ratio = D_wide$`ratio.Ball Sharer`
+
 D_wide$ratio = ordered(D_wide$ratio)
 
-lm.fit = lm(dif~as.factor(ratio), data = D_wide)
-summary(lm.fit)
+lm.fit.cond.1 = lm(diff~as.factor(ratio), 
+            data = D_wide[D_wide$condition=="Condition 1",])
+summary(lm.fit.cond.1)
+
+lm.fit.cond.2 = lm(diff~as.factor(ratio), 
+                   data = D_wide[D_wide$condition=="Condition 1",])
+summary(lm.fit.cond.2)
 
 # 100% comfort v. 0% non-comfort
 one.hundred.zero.comfort.saliva.sharer = D$lookingTime[D$ratio=="100% comfort v. 0% non-comfort" & 
-                                           D$condition=="Experimental Condition" & D$trialType=="Saliva Sharer"]
+                                           D$condition=="Condition 1" & D$trialType=="Saliva Sharer"]
 
 one.hundred.zero.comfort.ball.sharer = D$lookingTime[D$ratio=="100% comfort v. 0% non-comfort" & 
-                                                         D$condition=="Experimental Condition" & D$trialType=="Ball Sharer"]
+                                                         D$condition=="Condition 1" & D$trialType=="Ball Sharer"]
 
 
 one.hundred.zero.comfort.dif = one.hundred.zero.comfort.saliva.sharer - one.hundred.zero.comfort.ball.sharer
@@ -299,10 +292,10 @@ sd(one.hundred.zero.comfort.dif)
 
 # 90% comfort v. 10% non-comfort
 ninety.ten.comfort.saliva.sharer = D$lookingTime[D$ratio=="90% comfort v. 10% non-comfort" & 
-                                                   D$condition=="Experimental Condition" & D$trialType=="Saliva Sharer"]
+                                                   D$condition=="Condition 1" & D$trialType=="Saliva Sharer"]
 
 ninety.ten.comfort.ball.sharer = D$lookingTime[D$ratio=="90% comfort v. 10% non-comfort" & 
-                                                 D$condition=="Experimental Condition" & D$trialType=="Ball Sharer"]
+                                                 D$condition=="Condition 1" & D$trialType=="Ball Sharer"]
 
 
 ninety.ten.comfort.dif = ninety.ten.comfort.saliva.sharer - ninety.ten.comfort.ball.sharer
@@ -312,10 +305,10 @@ sd(ninety.ten.comfort.dif)
 
 # 80% comfort v. 20% non-comfort
 eighty.twenty.comfort.saliva.sharer = D$lookingTime[D$ratio=="80% comfort v. 20% non-comfort" & 
-                                                      D$condition=="Experimental Condition" & D$trialType=="Saliva Sharer"]
+                                                      D$condition=="Condition 1" & D$trialType=="Saliva Sharer"]
 
 eighty.twenty.comfort.ball.sharer = D$lookingTime[D$ratio=="80% comfort v. 20% non-comfort" & 
-                                                    D$condition=="Experimental Condition" & D$trialType=="Ball Sharer"]
+                                                    D$condition=="Condition 1" & D$trialType=="Ball Sharer"]
 
 
 eighty.twenty.comfort.dif = eighty.twenty.comfort.saliva.sharer - eighty.twenty.comfort.ball.sharer
@@ -324,10 +317,10 @@ sd(eighty.twenty.comfort.dif)
 
 # 20% comfort v. 80% non-comfort
 twenty.eighty.comfort.saliva.sharer = D$lookingTime[D$ratio=="20% comfort v. 80% non-comfort" & 
-                                                      D$condition=="Experimental Condition" & D$trialType=="Saliva Sharer"]
+                                                      D$condition=="Condition 1" & D$trialType=="Saliva Sharer"]
 
 twenty.eighty.comfort.ball.sharer = D$lookingTime[D$ratio=="20% comfort v. 80% non-comfort" & 
-                                                    D$condition=="Experimental Condition" & D$trialType=="Ball Sharer"]
+                                                    D$condition=="Condition 1" & D$trialType=="Ball Sharer"]
 
 
 twenty.eighty.comfort.dif = twenty.eighty.comfort.saliva.sharer - twenty.eighty.comfort.ball.sharer
@@ -337,10 +330,10 @@ sd(twenty.eighty.comfort.dif)
 
 # 10% comfort v. 90% non-comfort
 ten.ninety.comfort.saliva.sharer = D$lookingTime[D$ratio=="10% comfort v. 90% non-comfort" & 
-                                                   D$condition=="Experimental Condition" & D$trialType=="Saliva Sharer"]
+                                                   D$condition=="Condition 1" & D$trialType=="Saliva Sharer"]
 
 ten.ninety.comfort.ball.sharer = D$lookingTime[D$ratio=="10% comfort v. 90% non-comfort" & 
-                                                 D$condition=="Experimental Condition" & D$trialType=="Ball Sharer"]
+                                                 D$condition=="Condition 1" & D$trialType=="Ball Sharer"]
 
 
 ten.ninety.comfort.dif = ten.ninety.comfort.saliva.sharer - ten.ninety.comfort.ball.sharer
@@ -349,10 +342,10 @@ sd(ten.ninety.comfort.dif)
 
 # 0% comfort v. 100% non-comfort
 zero.one.hundred.comfort.saliva.sharer = D$lookingTime[D$ratio=="0% comfort v. 100% non-comfort" & 
-                                                         D$condition=="Experimental Condition" & D$trialType=="Saliva Sharer"]
+                                                         D$condition=="Condition 1" & D$trialType=="Saliva Sharer"]
 
 zero.one.hundred.comfort.ball.sharer = D$lookingTime[D$ratio=="0% comfort v. 100% non-comfort" & 
-                                                       D$condition=="Experimental Condition" & D$trialType=="Ball Sharer"]
+                                                       D$condition=="Condition 1" & D$trialType=="Ball Sharer"]
 
 
 zero.one.hundred.comfort.dif = zero.one.hundred.comfort.saliva.sharer - zero.one.hundred.comfort.ball.sharer
@@ -388,7 +381,7 @@ condition_barplot + stat_summary(fun = mean, geom = "bar", position = "dodge") +
   scale_fill_manual(values = c("black", "azure3")) +
   labs(fill="Trial type")  +
   theme(
-    axis.text.x = element_text(size = 22, angle = 20, hjust = 1),
+    axis.text.x = element_text(size = 22),
     axis.text.y = element_text(size = 22), 
     legend.text = element_text(size = 22),
     legend.title = element_text(size = 22),

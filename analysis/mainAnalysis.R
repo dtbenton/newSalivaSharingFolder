@@ -386,7 +386,7 @@ D$pretrainEpoch = as.factor(D$pretrainEpoch)
 
 
 # create condition column
-D$condition = rep(c("Experimental Condition", "Control Condition"), 
+D$condition = rep(c("Condition 1", "Condition 2"), 
                   each = 240)
 D$condition = as.factor(D$condition)
 
@@ -407,24 +407,24 @@ anova.lme(lm.fit)
 
 # condition x test trial interaction
 
-# Experimental Condition
-t.test(D$lookingTime[D$condition=="Experimental Condition" & D$trialType=="Comforter"],
-       D$lookingTime[D$condition=="Experimental Condition" & D$trialType=="Non-comforter"], 
+# Condition 1
+t.test(D$lookingTime[D$condition=="Condition 1" & D$trialType=="Comforter"],
+       D$lookingTime[D$condition=="Condition 1" & D$trialType=="Non-comforter"], 
        paired = TRUE)
-mean(D$lookingTime[D$condition=="Experimental Condition" & D$trialType=="Comforter"])
-sd(D$lookingTime[D$condition=="Experimental Condition" & D$trialType=="Comforter"])
-mean(D$lookingTime[D$condition=="Experimental Condition" & D$trialType=="Non-comforter"])
-sd(D$lookingTime[D$condition=="Experimental Condition" & D$trialType=="Non-comforter"])
+mean(D$lookingTime[D$condition=="Condition 1" & D$trialType=="Comforter"])
+sd(D$lookingTime[D$condition=="Condition 1" & D$trialType=="Comforter"])
+mean(D$lookingTime[D$condition=="Condition 1" & D$trialType=="Non-comforter"])
+sd(D$lookingTime[D$condition=="Condition 1" & D$trialType=="Non-comforter"])
 
 
-# Control Condition
-t.test(D$lookingTime[D$condition=="Control Condition" & D$trialType=="Comforter"],
-       D$lookingTime[D$condition=="Control Condition" & D$trialType=="Non-comforter"], 
+# Condition 2
+t.test(D$lookingTime[D$condition=="Condition 2" & D$trialType=="Comforter"],
+       D$lookingTime[D$condition=="Condition 2" & D$trialType=="Non-comforter"], 
        paired = TRUE)
-mean(D$lookingTime[D$condition=="Control Condition" & D$trialType=="Comforter"])
-sd(D$lookingTime[D$condition=="Control Condition" & D$trialType=="Comforter"])
-mean(D$lookingTime[D$condition=="Control Condition" & D$trialType=="Non-comforter"])
-sd(D$lookingTime[D$condition=="Control Condition" & D$trialType=="Non-comforter"])
+mean(D$lookingTime[D$condition=="Condition 2" & D$trialType=="Comforter"])
+sd(D$lookingTime[D$condition=="Condition 2" & D$trialType=="Comforter"])
+mean(D$lookingTime[D$condition=="Condition 2" & D$trialType=="Non-comforter"])
+sd(D$lookingTime[D$condition=="Condition 2" & D$trialType=="Non-comforter"])
 
 
 ####################
@@ -441,7 +441,7 @@ condition_barplot + stat_summary(fun = mean, geom = "bar", position = "dodge") +
   scale_fill_manual(values = c("black", "azure3")) +
   labs(fill='Test Trial')  +
   theme(
-    axis.text.x = element_text(size = 22, angle = 20, hjust = 1),
+    axis.text.x = element_text(size = 22),
     axis.text.y = element_text(size = 22), 
     legend.text = element_text(size = 22),
     legend.title = element_text(size = 22),
@@ -534,7 +534,7 @@ D$trialType = rep(c("Saliva Sharer", "Non-saliva Sharer"), each = 1, times = 240
 D$trialType = as.factor(D$trialType)
 
 #create condition column
-D$condition = rep(c("Experimental Condition", "Control Condition"), each = 240)
+D$condition = rep(c("Condition 1", "Condition 2"), each = 240)
 D$condition = as.factor(D$condition)
 
 # create pretrainEpochs column
@@ -562,10 +562,10 @@ anova.lme(lm.fit)
 ## follow-up analysis: Young
 # experimental
 young.salivasharer.experimental = D$lookingTime[D$age=="Young" & 
-                                                  D$condition=="Experimental Condition" & 
+                                                  D$condition=="Condition 1" & 
                                                   D$trialType=="Saliva Sharer"]
 young.ballsharer.experimental = D$lookingTime[D$age=="Young" & 
-                                                D$condition=="Experimental Condition" & 
+                                                D$condition=="Condition 1" & 
                                                 D$trialType=="Ball Sharer"]
 t.test(young.salivasharer.experimental,
        young.ballsharer.experimental, paired = TRUE)
@@ -583,10 +583,10 @@ sd(young.ballsharer.experimental)
 ## follow-up analysis: early intermediate
 # experimental
 intermediate.salivasharer.experimental = D$lookingTime[D$age=="Intermediate" & 
-                                                               D$condition=="Experimental Condition" & 
+                                                               D$condition=="Condition 1" & 
                                                                D$trialType=="Saliva Sharer"]
 intermediate.ballsharer.experimental = D$lookingTime[D$age=="Intermediate" & 
-                                                             D$condition=="Experimental Condition" & 
+                                                             D$condition=="Condition 1" & 
                                                              D$trialType=="Ball Sharer"]
 t.test(intermediate.salivasharer.experimental,
        intermediate.ballsharer.experimental, paired = TRUE)
@@ -603,10 +603,10 @@ sd(intermediate.ballsharer.experimental)
 ## follow-up analysis: old
 # experimental
 old.salivasharer.experimental = D$lookingTime[D$age=="Old" & 
-                                                D$condition=="Experimental Condition" & 
+                                                D$condition=="Condition 1" & 
                                                 D$trialType=="Saliva Sharer"]
 old.ballsharer.experimental = D$lookingTime[D$age=="Old" & 
-                                              D$condition=="Experimental Condition" & 
+                                              D$condition=="Condition 1" & 
                                               D$trialType=="Ball Sharer"]
 t.test(old.salivasharer.experimental,
        old.ballsharer.experimental, paired = TRUE)
@@ -621,19 +621,19 @@ sd(old.ballsharer.experimental)
 
 # difference analysis 
 young.dif = D$lookingTime[D$age=="Young" & 
-                            D$condition=="Experimental Condition" & 
+                            D$condition=="Condition 1" & 
                             D$trialType=="Saliva Sharer"] -
   D$lookingTime[D$age=="Young" & 
-                  D$condition=="Experimental Condition" & 
+                  D$condition=="Condition 1" & 
                   D$trialType=="Ball Sharer"]
 mean(young.dif)
 sd(young.dif)
 
 intermediate.dif = D$lookingTime[D$age=="Intermediate" & 
-                                         D$condition=="Experimental Condition" & 
+                                         D$condition=="Condition 1" & 
                                          D$trialType=="Saliva Sharer"] -
   D$lookingTime[D$age=="Intermediate" & 
-                  D$condition=="Experimental Condition" & 
+                  D$condition=="Condition 1" & 
                   D$trialType=="Ball Sharer"]
 
 mean(intermediate.dif)
@@ -641,10 +641,10 @@ sd(intermediate.dif)
 
 
 old.dif = D$lookingTime[D$age=="Old" & 
-                                   D$condition=="Experimental Condition" & 
+                                   D$condition=="Condition 1" & 
                                    D$trialType=="Saliva Sharer"] -
   D$lookingTime[D$age=="Old" & 
-                  D$condition=="Experimental Condition" & 
+                  D$condition=="Condition 1" & 
                   D$trialType=="Ball Sharer"]
 
 mean(old.dif)
@@ -694,7 +694,7 @@ condition_barplot + stat_summary(fun = mean, geom = "bar", position = "dodge") +
   scale_fill_manual(values = c("black", "azure3")) +
   labs(fill='Test Trial')  +
   theme(
-    axis.text.x = element_text(size = 22, angle = 20, hjust = 1),
+    axis.text.x = element_text(size = 22),
     axis.text.y = element_text(size = 22), 
     legend.text = element_text(size = 22),
     legend.title = element_text(size = 22),
