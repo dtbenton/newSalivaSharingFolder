@@ -260,7 +260,7 @@ proc devSim {} {
 }
 
 # To automate the simulation, uncomment the following bit of code
-devSim
+#devSim
 
 #set modelList [list gridSim devSim]
 
